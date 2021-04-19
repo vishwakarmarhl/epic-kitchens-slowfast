@@ -46,27 +46,30 @@ def train_epoch(train_loader, model, optimizer, train_meter, cur_epoch, cfg):
 
     for cur_iter, (inputs, labels, _, meta) in enumerate(train_loader):
         # Transfer the data to the current GPU device.
-        if isinstance(inputs, (list,)):
-            for i in range(len(inputs)):
-                inputs[i] = inputs[i].cuda(non_blocking=True)
-        else:
-            inputs = inputs.cuda(non_blocking=True)
-        if isinstance(labels, (dict,)):
-            labels = {k: v.cuda() for k, v in labels.items()}
-        else:
-            labels = labels.cuda()
-        for key, val in meta.items():
-            if isinstance(val, (list,)):
-                for i in range(len(val)):
-                    val[i] = val[i].cuda(non_blocking=True)
+        if cfg.NUM_GPUS:
+            if isinstance(inputs, (list,)):
+                for i in range(len(inputs)):
+                    inputs[i] = inputs[i].cuda(non_blocking=True)
             else:
-                meta[key] = val.cuda(non_blocking=True)
+                inputs = inputs.cuda(non_blocking=True)
+            if isinstance(labels, (dict,)):
+                labels = {k: v.cuda() for k, v in labels.items()}
+            else:
+                labels = labels.cuda()
 
         # Update the learning rate.
         lr = optim.get_epoch_lr(cur_epoch + float(cur_iter) / data_size, cfg)
         optim.set_lr(optimizer, lr)
 
         if cfg.DETECTION.ENABLE:
+            logger.info("Detection Metadata: {}".format(meta))
+            for key, val in meta.items():
+                print(type(key), type(val))
+                if isinstance(val, (list,)):
+                    for i in range(len(val)):
+                        val[i] = val[i].cuda(non_blocking=True)
+                else:
+                    meta[key] = val.cuda(non_blocking=True)
             # Compute the predictions.
             preds = model(inputs, meta["boxes"])
 
@@ -227,14 +230,15 @@ def eval_epoch(val_loader, model, val_meter, cur_epoch, cfg):
             labels = {k: v.cuda() for k, v in labels.items()}
         else:
             labels = labels.cuda()
-        for key, val in meta.items():
-            if isinstance(val, (list,)):
-                for i in range(len(val)):
-                    val[i] = val[i].cuda(non_blocking=True)
-            else:
-                meta[key] = val.cuda(non_blocking=True)
 
         if cfg.DETECTION.ENABLE:
+            logger.info("Detection Metadata: {}".format(meta))
+            for key, val in meta.items():
+                if isinstance(val, (list,)):
+                    for i in range(len(val)):
+                        val[i] = val[i].cuda(non_blocking=True)
+                else:
+                    meta[key] = val.cuda(non_blocking=True)
             # Compute the predictions.
             preds = model(inputs, meta["boxes"])
 

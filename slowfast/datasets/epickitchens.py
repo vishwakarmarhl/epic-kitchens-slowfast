@@ -66,9 +66,18 @@ class Epickitchens(torch.utils.data.Dataset):
         self._spatial_temporal_idx = []
         for file in path_annotations_pickle:
             for tup in pd.read_pickle(file).iterrows():
-                for idx in range(self._num_clips):
-                    self._video_records.append(EpicKitchensVideoRecord(tup))
-                    self._spatial_temporal_idx.append(idx)
+                # b slowfast/datasets/epickitchens.py:70
+                if self.cfg.DATA.LOAD_SELECTOR_LIST is not None and len(self.cfg.DATA.LOAD_SELECTOR_LIST) > 0:
+                    # Proceed with selected dataset videos prefixes. Eg ["P01", "P02"]
+                    if tup[0][0:3] in self.cfg.DATA.LOAD_SELECTOR_LIST:
+                        for idx in range(self._num_clips):
+                            self._video_records.append(EpicKitchensVideoRecord(tup))
+                            self._spatial_temporal_idx.append(idx)
+                else: 
+                    # Proceed with entire dataset
+                    for idx in range(self._num_clips):
+                        self._video_records.append(EpicKitchensVideoRecord(tup))
+                        self._spatial_temporal_idx.append(idx)
         assert (
                 len(self._video_records) > 0
         ), "Failed to load EPIC-KITCHENS split {} from {}".format(

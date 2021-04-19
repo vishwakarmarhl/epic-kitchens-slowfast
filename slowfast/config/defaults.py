@@ -249,6 +249,9 @@ _C.DATA.TRAIN_CROP_SIZE = 224
 # The spatial crop size for testing.
 _C.DATA.TEST_CROP_SIZE = 256
 
+# Load selected videos with named 3 character prefixes. Eg ["P01", "P02"]
+_C.DATA.LOAD_SELECTOR_LIST = None
+
 
 # ---------------------------------------------------------------------------- #
 # Optimizer options

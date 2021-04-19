@@ -1,0 +1,42 @@
+# 
+# conda env create -n epic-slowfast --file environment.yml --force
+# conda env update -n epic-slowfast --file environment.yml --prune
+# conda env remove -n epic-slowfast
+# 
+name: epic-slowfast
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.7
+  - cython
+  - simplejson
+  - psutil
+  - pip
+  - requests
+  - jupyterlab
+  - cloudpickle
+  - matplotlib
+  - tqdm
+  - sqlite
+  - pyyaml
+  - pandas
+  - scipy
+  - scikit-learn
+  - scikit-image
+  - pillow
+  - av
+  - moviepy
+  - pytorch=1.7.0
+  - torchvision=0.8.0 
+  - cudatoolkit=11.0
+  - numba
+  - pip:
+    - iopath
+    - sklearn
+    - opencv-python
+    - tensorboard
+    - -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu110/torch1.7/index.html
+    - detectron2==0.4

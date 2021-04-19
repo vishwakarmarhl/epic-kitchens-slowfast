@@ -26,6 +26,8 @@ def topks_correct(preds, labels, ks):
     assert preds.size(0) == labels.size(
         0
     ), "Batch dim of predictions and labels must match"
+    #import pdb; pdb.set_trace()
+    
     # Find the top max_k predictions for each sample
     _top_max_k_vals, top_max_k_inds = torch.topk(
         preds, max(ks), dim=1, largest=True, sorted=True
@@ -38,7 +40,7 @@ def topks_correct(preds, labels, ks):
     top_max_k_correct = top_max_k_inds.eq(rep_max_k_labels)
     # Compute the number of topk correct predictions for each k.
     topks_correct = [
-        top_max_k_correct[:k, :].view(-1).float().sum() for k in ks
+        top_max_k_correct[:k, :].contiguous().view(-1).float().sum() for k in ks
     ]
     return topks_correct
 
